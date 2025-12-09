@@ -112,6 +112,18 @@ const KanbanBoard = () => {
     }
   };
 
+  // Get project members only for the selected project
+  const getProjectMembers = () => {
+    if (!selectedProject) return [];
+    
+    const project = projects.find(p => p._id === selectedProject);
+    if (!project || !project.members) return [];
+    
+    // Filter users to only include those who are members of the selected project
+    const memberUserIds = project.members.map(member => member.userId?._id || member.userId);
+    return users.filter(user => memberUserIds.includes(user._id));
+  };
+
   const handleProjectChange = (e) => {
     setSelectedProject(e.target.value);
   };
@@ -432,7 +444,7 @@ const KanbanBoard = () => {
                   required
                 >
                   <option value="">Select Assignee</option>
-                  {users.map(user => (
+                  {getProjectMembers().map(user => (
                     <option key={user._id} value={user._id}>
                       {user.username} - {user.team} ({user.role})
                     </option>

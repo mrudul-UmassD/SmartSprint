@@ -31,6 +31,7 @@ const TaskList = ({ projectId }) => {
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [users, setUsers] = useState([]);
+  const [project, setProject] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [tabKey, setTabKey] = useState('active');
@@ -55,11 +56,24 @@ const TaskList = ({ projectId }) => {
     }
     
     if (projectId) {
+      fetchProject();
       fetchTasks();
       fetchCompletedTasks();
       fetchUsers();
     }
   }, [projectId]);
+
+  const fetchProject = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.PROJECTS_ENDPOINT}/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProject(response.data);
+    } catch (error) {
+      console.error('Error fetching project:', error);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -105,6 +119,15 @@ const TaskList = ({ projectId }) => {
     } catch (error) {
       console.error('Error fetching users:', error);
     }
+  };
+
+  // Get project members only for the current project
+  const getProjectMembers = () => {
+    if (!project || !project.members) return [];
+    
+    // Filter users to only include those who are members of the project
+    const memberUserIds = project.members.map(member => member.userId?._id || member.userId);
+    return users.filter(user => memberUserIds.includes(user._id));
   };
 
   const handleOpen = (task = null) => {
@@ -488,7 +511,7 @@ const TaskList = ({ projectId }) => {
                   onChange={handleChange}
                 >
                   <option value="">Unassigned</option>
-                  {users.map(user => (
+                  {getProjectMembers().map(user => (
                     <option key={user._id} value={user._id}>
                       {user.username} ({user.role})
                     </option>
