@@ -31,6 +31,7 @@ router.post('/login', async (req, res) => {
         }
 
         console.log('User found:', user.username, 'Role:', user.role);
+        console.log('User team:', user.team, 'Level:', user.level);
         
         // Check password
         const isMatch = await user.comparePassword(password);

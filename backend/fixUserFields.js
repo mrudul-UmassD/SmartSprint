@@ -15,34 +15,36 @@ const fixUserFields = async () => {
         console.log(`Found ${users.length} users to check`);
         
         for (const user of users) {
-            let needsSave = false;
+            let needsUpdate = false;
+            const updates = {};
             
             // Set defaults for Admin
             if (user.role === 'Admin') {
-                if (!user.team || user.team !== 'admin') {
-                    user.team = 'admin';
-                    needsSave = true;
+                if (user.team !== 'admin') {
+                    updates.team = 'admin';
+                    needsUpdate = true;
                 }
-                if (!user.level || user.level !== 'admin') {
-                    user.level = 'admin';
-                    needsSave = true;
+                if (user.level !== 'admin') {
+                    updates.level = 'admin';
+                    needsUpdate = true;
                 }
             }
             
             // Set defaults for Project Manager
             if (user.role === 'Project Manager') {
-                if (!user.team || user.team !== 'PM') {
-                    user.team = 'PM';
-                    needsSave = true;
+                if (user.team !== 'PM') {
+                    updates.team = 'PM';
+                    needsUpdate = true;
                 }
-                if (!user.level || user.level !== 'PM') {
-                    user.level = 'PM';
-                    needsSave = true;
+                if (user.level !== 'PM') {
+                    updates.level = 'PM';
+                    needsUpdate = true;
                 }
             }
             
-            if (needsSave) {
-                await user.save();
+            if (needsUpdate) {
+                // Use updateOne to bypass pre-save hooks
+                await User.updateOne({ _id: user._id }, { $set: updates });
                 console.log(`✓ Fixed user: ${user.username} (${user.role})`);
             } else {
                 console.log(`✓ User OK: ${user.username} (${user.role})`);
