@@ -31,6 +31,10 @@ const testLogin = async () => {
                 if (error.response) {
                     console.log(`  Status: ${error.response.status}`);
                     console.log(`  Error: ${error.response.data.error}`);
+                    console.log(`  Full response:`, JSON.stringify(error.response.data, null, 2));
+                } else if (error.request) {
+                    console.log(`  No response received from server`);
+                    console.log(`  Is the backend server running on port 5000?`);
                 } else {
                     console.log(`  Error: ${error.message}`);
                 }
