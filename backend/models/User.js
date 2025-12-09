@@ -39,20 +39,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Frontend', 'Backend', 'Design', 'DevOps', 'QA', 'PM', 'admin'],
         required: function() {
-            // Required for all roles except when not set
-            return ['Developer', 'Designer', 'Project Manager', 'Admin'].includes(this.role);
-        },
-        validate: {
-            validator: function(value) {
-                if (this.role === 'Admin') {
-                    return value === 'admin';
-                }
-                if (this.role === 'Project Manager') {
-                    return value === 'PM';
-                }
-                return true;
-            },
-            message: 'Team should be \'admin\' for Admin role and \'PM\' for Project Manager role'
+            // Team is required for Developers and Designers only
+            return ['Developer', 'Designer'].includes(this.role);
         }
     },
     projects: [{
@@ -63,20 +51,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Junior', 'Mid', 'Senior', 'Lead', 'PM', 'admin'],
         required: function() {
-            // Required for all roles
-            return ['Developer', 'Designer', 'Project Manager', 'Admin'].includes(this.role);
-        },
-        validate: {
-            validator: function(value) {
-                if (this.role === 'Admin') {
-                    return value === 'admin';
-                }
-                if (this.role === 'Project Manager') {
-                    return value === 'PM';
-                }
-                return true;
-            },
-            message: 'Level should be \'admin\' for Admin role and \'PM\' for Project Manager role'
+            // Level is required for Developers and Designers only
+            return ['Developer', 'Designer'].includes(this.role);
         }
     },
     profilePicture: {
@@ -220,11 +196,19 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     }
 };
 
-// Pre-save middleware to ensure team and level are unset based on role
+// Pre-save middleware to set default team/level for PM and Admin if needed
 userSchema.pre('save', function(next) {
-    if (['Admin', 'Project Manager'].includes(this.role)) {
-        this.team = undefined;
-        this.level = undefined;
+    if (this.role === 'Admin' && !this.team) {
+        this.team = 'admin';
+    }
+    if (this.role === 'Admin' && !this.level) {
+        this.level = 'admin';
+    }
+    if (this.role === 'Project Manager' && !this.team) {
+        this.team = 'PM';
+    }
+    if (this.role === 'Project Manager' && !this.level) {
+        this.level = 'PM';
     }
     next();
 });
