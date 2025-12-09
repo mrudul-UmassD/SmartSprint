@@ -5,7 +5,7 @@ const cors = require('cors');
 // Rate limiting configuration
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 10000, // limit each IP to 10000 requests per windowMs
   message: {
     success: false,
     error: 'Too many requests',
@@ -16,7 +16,7 @@ const apiLimiter = rateLimit({
 // Login rate limiting
 const loginLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, 
+  max: 10000, 
   message: {
     success: false,
     error: 'Too many login attempts',
@@ -29,7 +29,7 @@ const loginLimiter = rateLimit({
 // Registration rate limiting
 const registerLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 3, // limit each IP to 3 registration attempts per day
+  max: 10000, // limit each IP to 10000 registration attempts per day
   message: {
     success: false,
     error: 'Too many registration attempts',
@@ -40,7 +40,7 @@ const registerLimiter = rateLimit({
 // Password reset rate limiting
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // limit each IP to 3 password reset attempts per hour
+  max: 10000, // limit each IP to 10000 password reset attempts per hour
   message: {
     success: false,
     error: 'Too many password reset attempts',
